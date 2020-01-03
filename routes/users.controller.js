@@ -2,7 +2,10 @@ const models = require('../model/models');
 
 exports.index = (req, res) => {
   models.User.findAll()
-    .then(users => res.json(users));
+    .then(users => res.json(users))
+    .catch(err => {
+      console.error(err);
+    });
 };
 
 
@@ -47,8 +50,6 @@ exports.destroy = (req, res) => {
 
 exports.create = (req, res) => {
   const name = req.body.name || '';
-  console.log(name);
-  console.log(name.length);
 
   if (!name.length) {
     return res.status(400).json({err: 'Incorrect name'});
@@ -62,21 +63,29 @@ exports.create = (req, res) => {
 
 exports.update = (req, res) => {
   const newName = req.body.name || '';
-  const name = models.User.name;
   const id = parseInt(req.params.id, 10);
 
-  if (!name.length) {
+  if (!newName.length) {
     return res.status(400).json({err: 'Incorrect Name'});
+  }
+
+  if (!id) {
+    return res.status(400).json({err: 'Incorrect ID'})
   }
 
   models.User.update(
     {name: newName},
     {
       where:
-        {id: id}, returning: true
+        {id: id}
     })
-    .then(function (result) {
-      res.json(result[1][0]);
+    .then(() => {
+      models.User.findOne({
+        where: {id: id}
+      })
+        .then((user) => {
+          return res.status(201).json(user)
+        });
     })
     .catch((err) => {
       return res.status(404).json({err: 'Undefined Error'})

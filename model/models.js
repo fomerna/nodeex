@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = new Sequelize('db', 'id', 'pw!', {
   host: 'address',
   dialect: 'mssql',
+  timezone: '+09:00',
   dialectOptions: {
     options: {
       useUTC: false,
@@ -11,7 +12,13 @@ const sequelize = new Sequelize('db', 'id', 'pw!', {
 });
 
 const User = sequelize.define('NODE_TEST_USER', {
-  name: Sequelize.STRING
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    // validate: {
+    //   isEmail: true
+    // }
+  }
 });
 
 
